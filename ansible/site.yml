@@ -1,0 +1,12 @@
+---
+- name: Configure common baseline on all servers
+  hosts: servers
+  become: true
+
+  roles:
+    - common
+    - ssh
+    - firewall
+    - nginx
+    - app
+    - docker

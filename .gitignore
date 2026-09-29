@@ -1,0 +1,24 @@
+# Ansible
+*.retry
+
+# Secrets
+*.key
+*.pem
+vault-password.txt
+
+# SSH
+id_rsa
+id_rsa.pub
+
+# Environment files
+.env
+.env.*
+
+# Temporary files
+*.log
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+

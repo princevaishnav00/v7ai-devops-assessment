@@ -1,0 +1,41 @@
+---
+- name: Create application directory
+  ansible.builtin.file:
+    path: /opt/v7ai-app
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy application index page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /opt/v7ai-app/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Verify application is responding
+  ansible.builtin.uri:
+    url: "{{ 'https://127.0.0.1' if inventory_hostname == 'vm1' else 'http://127.0.0.1' }}"
+    status_code: 200
+    return_content: true
+    validate_certs: false
+
+
+- name: Write application version
+  ansible.builtin.copy:
+    content: "{{ app_version }}\n"
+    dest: /opt/v7ai-app/VERSION
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Deploy application configuration
+  ansible.builtin.template:
+    src: app.conf.j2
+    dest: /opt/v7ai-app/app.conf
+    owner: root
+    group: root
+    mode: '0644'

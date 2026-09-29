@@ -1,0 +1,51 @@
+upstream app_backend {
+    server 172.30.0.12:80;
+    server 172.30.0.13:80;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name public.vm1.local;
+  
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name public.vm1.local;
+
+    ssl_certificate /etc/nginx/tls/public.vm1.local.crt;
+    ssl_certificate_key /etc/nginx/tls/public.vm1.local.key;
+
+
+    location /vm2/ {
+        proxy_pass http://172.30.0.12/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /vm3/ {
+        proxy_pass http://172.30.0.13/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location /app/ {
+        proxy_pass http://app_backend/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location / {
+        root /opt/v7ai-app;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+}

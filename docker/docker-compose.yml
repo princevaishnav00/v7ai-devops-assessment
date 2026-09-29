@@ -1,0 +1,45 @@
+services:
+  vm1:
+    image: v7ai-ubuntu:1.0
+    container_name: vm1
+    hostname: vm1
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 2011:22
+      - 80:80
+      - 443:443
+    networks:
+      v7ai-net:
+        ipv4_address: 172.30.0.11
+
+  vm2:
+    image: v7ai-ubuntu:1.0
+    container_name: vm2
+    hostname: vm2
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 2012:22
+    networks:
+      v7ai-net:
+        ipv4_address: 172.30.0.12
+
+  vm3:
+    image: v7ai-ubuntu:1.0
+    container_name: vm3
+    hostname: vm3
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 2013:22
+    networks:
+      v7ai-net:
+        ipv4_address: 172.30.0.13
+
+networks:
+  v7ai-net:
+    external: true

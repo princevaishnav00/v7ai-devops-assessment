@@ -1,0 +1,55 @@
+---
+- name: Install Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: Deploy custom index page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Create TLS directory on vm1
+  ansible.builtin.file:
+    path: /etc/nginx/tls
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: inventory_hostname == "vm1"
+
+- name: Deploy TLS certificate on vm1
+  ansible.builtin.copy:
+    src: tls/public.vm1.local.crt
+    dest: /etc/nginx/tls/public.vm1.local.crt
+    owner: root
+    group: root
+    mode: '0644'
+  when: inventory_hostname == "vm1"
+
+- name: Deploy TLS private key on vm1
+  ansible.builtin.copy:
+    src: tls/public.vm1.local.key
+    dest: /etc/nginx/tls/public.vm1.local.key
+    owner: root
+    group: root
+    mode: '0600'
+  when: inventory_hostname == "vm1"
+
+- name: Deploy Nginx site configuration
+  ansible.builtin.template:
+    src: "{{ 'reverse-proxy.conf.j2' if inventory_hostname == 'vm1' else 'default.conf.j2' }}"
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload Nginx
+
+- name: Validate Nginx configuration
+  ansible.builtin.command:
+    cmd: nginx -t
+  changed_when: false

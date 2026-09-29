@@ -1,0 +1,4 @@
+---
+- name: Reload Nginx
+  ansible.builtin.command:
+    cmd: nginx -s reload
